@@ -1,0 +1,8 @@
+export { Canvas } from './components/Canvas'
+export { Toolbar } from './components/Toolbar'
+export { LayersPanel } from './components/LayersPanel'
+export { PropertiesPanel } from './components/PropertiesPanel'
+export { EditorProvider, useEditorStore } from './context/EditorContext'
+export { useViewport } from './hooks/useViewport'
+export { useHistory } from './hooks/useHistory'
+export type { CanvasObject, Tool, Viewport } from './types'
