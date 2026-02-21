@@ -1,107 +1,121 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import {
-  Zap,
-  Server,
-  Route as RouteIcon,
-  Shield,
-  Waves,
-  Sparkles,
+  MousePointer2,
+  Square,
+  Circle,
+  Type,
+  Pen,
+  Layers,
+  Settings2,
+  Undo2,
+  Redo2,
 } from 'lucide-react'
 
-export const Route = createFileRoute('/')({ component: App })
+export const Route = createFileRoute('/')({ component: HomePage })
 
-function App() {
+function HomePage() {
   const features = [
     {
-      icon: <Zap className="w-12 h-12 text-cyan-400" />,
-      title: 'Powerful Server Functions',
+      icon: <MousePointer2 className="w-10 h-10" />,
+      bg: 'bg-[var(--brutal-cyan)]',
+      title: 'Select & Move',
       description:
-        'Write server-side code that seamlessly integrates with your client components. Type-safe, secure, and simple.',
+        'Click to select objects, drag to reposition, and resize with handles. Multi-select coming soon.',
     },
     {
-      icon: <Server className="w-12 h-12 text-cyan-400" />,
-      title: 'Flexible Server Side Rendering',
+      icon: <Square className="w-10 h-10" />,
+      bg: 'bg-[var(--brutal-pink)]',
+      title: 'Shapes',
       description:
-        'Full-document SSR, streaming, and progressive enhancement out of the box. Control exactly what renders where.',
+        'Draw rectangles and ellipses. Pick any fill color and customize dimensions.',
     },
     {
-      icon: <RouteIcon className="w-12 h-12 text-cyan-400" />,
-      title: 'API Routes',
+      icon: <Type className="w-10 h-10" />,
+      bg: 'bg-[var(--brutal-green)]',
+      title: 'Text',
       description:
-        'Build type-safe API endpoints alongside your application. No separate backend needed.',
+        'Add text layers with adjustable font size and styling. Double-click to edit inline.',
     },
     {
-      icon: <Shield className="w-12 h-12 text-cyan-400" />,
-      title: 'Strongly Typed Everything',
+      icon: <Pen className="w-10 h-10" />,
+      bg: 'bg-[var(--brutal-purple)]',
+      title: 'Freehand Pen',
       description:
-        'End-to-end type safety from server to client. Catch errors before they reach production.',
+        'Draw custom paths with the pen tool. Create curves with bezier handles for precise control.',
     },
     {
-      icon: <Waves className="w-12 h-12 text-cyan-400" />,
-      title: 'Full Streaming Support',
+      icon: <Layers className="w-10 h-10" />,
+      bg: 'bg-[var(--brutal-yellow)]',
+      title: 'Layers Panel',
       description:
-        'Stream data from server to client progressively. Perfect for AI applications and real-time updates.',
+        'Manage all objects in a layer list. Drag to reorder, rename layers, and keep your design organized.',
     },
     {
-      icon: <Sparkles className="w-12 h-12 text-cyan-400" />,
-      title: 'Next Generation Ready',
+      icon: <Settings2 className="w-10 h-10" />,
+      bg: 'bg-[var(--brutal-cyan)]',
+      title: 'Properties',
       description:
-        'Built from the ground up for modern web applications. Deploy anywhere JavaScript runs.',
+        'Edit position, size, rotation, and fill color. For text: change content and font size.',
+    },
+    {
+      icon: (
+        <span className="flex gap-1">
+          <Undo2 className="w-10 h-10" />
+          <Redo2 className="w-10 h-10" />
+        </span>
+      ),
+      bg: 'bg-[var(--brutal-pink)]',
+      title: 'Undo & Redo',
+      description:
+        'Full history support. Use Ctrl+Z and Ctrl+Shift+Z or the toolbar buttons.',
     },
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <section className="relative py-20 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10"></div>
-        <div className="relative max-w-5xl mx-auto">
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <img
-              src="/tanstack-circle-logo.png"
-              alt="TanStack Logo"
-              className="w-24 h-24 md:w-32 md:h-32"
-            />
-            <h1 className="text-6xl md:text-7xl font-black text-white [letter-spacing:-0.08em]">
-              <span className="text-gray-300">TANSTACK</span>{' '}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                START
+    <div className="min-h-screen bg-[var(--brutal-white)]">
+      <section className="py-16 px-6 text-center border-b-[3px] border-[var(--brutal-black)] bg-[var(--brutal-yellow)]">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-[var(--brutal-black)] flex items-center justify-center border-[3px] border-[var(--brutal-black)] shadow-[6px_6px_0_var(--brutal-black)]">
+              <span className="text-3xl md:text-4xl font-black text-[var(--brutal-yellow)]">
+                D
               </span>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-black text-[var(--brutal-black)] [letter-spacing:-0.04em]">
+              DIBBLE
             </h1>
           </div>
-          <p className="text-2xl md:text-3xl text-gray-300 mb-4 font-light">
-            The framework for next generation AI applications
+          <p className="text-lg md:text-xl text-[var(--brutal-black)] mb-2 font-bold">
+            Canva-style design editor
           </p>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-8">
-            Full-stack framework powered by TanStack Router for React and Solid.
-            Build modern applications with server functions, streaming, and type
-            safety.
+          <p className="text-base text-[var(--brutal-black)]/80 max-w-2xl mx-auto mb-8 font-medium">
+            Create designs with shapes, text, and freehand drawing. Pan and zoom
+            the canvas. Ctrl+plus/minus to zoom, or scroll to pan.
           </p>
-          <div className="flex flex-col items-center gap-4">
-            <Link
-              to="/editor"
-              className="px-8 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors shadow-lg shadow-cyan-500/50"
-            >
-              Open Editor
-            </Link>
-            <p className="text-gray-400 text-sm mt-2">
-              A Canva-style design editor built from scratch with HTML5 Canvas
-            </p>
-          </div>
+          <Link
+            to="/editor"
+            className="inline-block px-8 py-4 bg-[var(--brutal-black)] text-[var(--brutal-yellow)] font-bold border-[3px] border-[var(--brutal-black)] shadow-[6px_6px_0_var(--brutal-black)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[4px_4px_0_var(--brutal-black)] transition-all"
+          >
+            OPEN EDITOR
+          </Link>
         </div>
       </section>
 
-      <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="py-12 px-6 max-w-6xl mx-auto">
+        <h2 className="text-2xl font-black text-[var(--brutal-black)] mb-8 text-center">
+          EDITOR FEATURES
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
+              className={`${feature.bg} border-[3px] border-[var(--brutal-black)] p-5 shadow-[4px_4px_0_var(--brutal-black)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_var(--brutal-black)] transition-all`}
             >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-white mb-3">
+              <div className="mb-3 text-[var(--brutal-black)]">{feature.icon}</div>
+              <h3 className="text-lg font-bold text-[var(--brutal-black)] mb-2">
                 {feature.title}
               </h3>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-[var(--brutal-black)]/90 text-sm leading-relaxed font-medium">
                 {feature.description}
               </p>
             </div>

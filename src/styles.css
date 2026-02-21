@@ -1,15 +1,58 @@
 @import "tailwindcss";
 
+/* Neobrutalism design tokens – balanced saturation */
+:root {
+  --brutal-black: #2a2a2a;
+  --brutal-white: #fefdfb;
+  --brutal-yellow: #ffd54f;
+  --brutal-cyan: #5ec8e8;
+  --brutal-pink: #f285a8;
+  --brutal-green: #5dd88a;
+  --brutal-red: #f08282;
+  --brutal-purple: #a78bfa;
+  --brutal-border: 2px solid var(--brutal-black);
+  --brutal-shadow: 3px 3px 0 var(--brutal-black);
+  --brutal-shadow-lg: 5px 5px 0 var(--brutal-black);
+}
+
 body {
   @apply m-0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family: "Space Grotesk", "JetBrains Mono", "IBM Plex Sans", system-ui,
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--brutal-white);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* Neobrutalist utilities */
+.brutal-border {
+  border: var(--brutal-border);
+}
+
+.brutal-shadow {
+  box-shadow: var(--brutal-shadow);
+}
+
+.brutal-shadow-lg {
+  box-shadow: var(--brutal-shadow-lg);
+}
+
+.brutal-btn {
+  border: var(--brutal-border);
+  box-shadow: var(--brutal-shadow);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.brutal-btn:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--brutal-black);
+}
+
+.brutal-btn:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--brutal-black);
 }

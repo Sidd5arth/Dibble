@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Canvas, Toolbar, LayersPanel, PropertiesPanel, EditorProvider, useEditorStore, useHistory } from '../editor'
+import { Canvas, LayersPanel, PropertiesPanel, EditorProvider, useEditorStore, useHistory } from '../editor'
+import EditorHeader from '../components/EditorHeader'
 
 export const Route = createFileRoute('/editor')({
   component: EditorPage,
@@ -36,20 +37,29 @@ function HistoryManager() {
 }
 
 function EditorPage() {
+  useEffect(() => {
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   return (
     <EditorProvider>
       <ZoomShortcuts />
       <HistoryManager />
-      <div className="flex flex-col h-[calc(100vh-4rem)]">
-        <Toolbar />
-      <div className="flex flex-1 min-h-0">
-        <div className="flex-1 min-w-0">
-          <Canvas />
+      <EditorHeader />
+      <div className="fixed top-16 left-0 right-0 bottom-0 flex flex-col overflow-hidden bg-[var(--brutal-white)]">
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          <LayersPanel />
+          <div className="flex-1 min-w-0 min-h-0 overflow-hidden">
+            <Canvas />
+          </div>
+          <PropertiesPanel />
         </div>
-        <LayersPanel />
-        <PropertiesPanel />
       </div>
-    </div>
     </EditorProvider>
   )
 }

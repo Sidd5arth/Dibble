@@ -51,7 +51,7 @@ function getHandle(
   const distToRotate = Math.sqrt(
     (localX - rotateHandleCenterX) ** 2 + (localY - rotateHandleCenterY) ** 2
   )
-  if (distToRotate <= 8) return 'rotate'
+  if (distToRotate <= 12) return 'rotate'
 
   const corners: [number, number, Handle][] = [
     [x, y, 'nw'],
@@ -135,35 +135,15 @@ export function useCanvasInteraction(
           const localY = dx * sin + dy * cos + obj.height / 2
           return getHandle(obj, localX, localY)
         }
-        if (hit && selectedIds.includes(hit.id)) {
-          const handle = tryHandleOn(hit)
-          if (handle) {
-            // Push history BEFORE starting drag (save old state)
-            store.pushHistory()
-            dragRef.current = {
-              type: handle === 'rotate' ? 'rotate' : 'resize',
-              obj: hit,
-              handle,
-              startX: x,
-              startY: y,
-              startObj: {
-                x: hit.x,
-                y: hit.y,
-                width: hit.width,
-                height: hit.height,
-                rotation: hit.rotation,
-              },
-            }
-            return
-          }
-        }
-        if (selectedIds.length > 0 && !hit) {
+
+        // Always check handles on selected objects FIRST – even when click is over
+        // another object (e.g. resize/rotate handle over a shape below)
+        if (selectedIds.length > 0) {
           for (let i = objects.length - 1; i >= 0; i--) {
             const obj = objects[i]
             if (!selectedIds.includes(obj.id)) continue
             const handle = tryHandleOn(obj)
             if (handle) {
-              // Push history BEFORE starting drag (save old state)
               store.pushHistory()
               dragRef.current = {
                 type: handle === 'rotate' ? 'rotate' : 'resize',
@@ -183,6 +163,7 @@ export function useCanvasInteraction(
             }
           }
         }
+
         if (hit) {
           store.selectObject(hit.id)
           // Push history BEFORE starting move (save old position)
@@ -215,6 +196,7 @@ export function useCanvasInteraction(
           fill: '#3b82f6',
           opacity: 1,
         })
+        store.setTool('select')
       } else if (tool === 'ellipse') {
         store.addObject({
           type: 'ellipse',
@@ -226,6 +208,7 @@ export function useCanvasInteraction(
           fill: '#10b981',
           opacity: 1,
         })
+        store.setTool('select')
       } else if (tool === 'text') {
         store.addObject({
           type: 'text',
@@ -243,6 +226,7 @@ export function useCanvasInteraction(
           fontStyle: 'normal',
           textAlign: 'left',
         } as any)
+        store.setTool('select')
       } else if (tool === 'pen') {
         if (!store.isPenDrawing) {
           store.startPenPath()

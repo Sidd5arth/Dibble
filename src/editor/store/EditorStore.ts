@@ -191,6 +191,7 @@ export class EditorStore {
     this.selectedIds = [newObj.id]
     this.isPenDrawing = false
     this.penPoints = []
+    this.tool = 'select'
   }
 
   cancelPenPath() {

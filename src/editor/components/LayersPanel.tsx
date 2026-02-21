@@ -79,15 +79,19 @@ export const LayersPanel = observer(function LayersPanel() {
   }
 
   return (
-    <div className="w-56 bg-slate-800 border-l border-slate-700 flex flex-col">
-      <div className="px-3 py-2 border-b border-slate-700">
-        <h3 className="font-semibold text-white text-sm">Layers</h3>
+    <div className="w-56 flex-shrink-0 bg-[var(--brutal-pink)] border-r-[3px] border-[var(--brutal-black)] flex flex-col min-h-0">
+      <div className="px-3 py-2 border-b-[3px] border-[var(--brutal-black)] bg-[var(--brutal-white)]">
+        <h3 className="font-bold text-[var(--brutal-black)] text-sm">
+          LAYERS
+        </h3>
       </div>
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 min-h-0 overflow-y-auto p-2 bg-[var(--brutal-pink)]">
         {store.objects.length === 0 ? (
-          <p className="text-slate-500 text-sm p-2">No layers yet</p>
+          <p className="text-[var(--brutal-black)]/70 text-sm p-2 font-medium">
+            No layers yet
+          </p>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-2">
             {layers.map((obj, displayIndex) => {
               const Icon = getIcon(obj.type)
               const isSelected = store.selectedIds.includes(obj.id)
@@ -104,19 +108,21 @@ export const LayersPanel = observer(function LayersPanel() {
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, displayIndex, obj)}
                   onClick={() => store.setSelectedIds([obj.id])}
-                  className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors cursor-grab active:cursor-grabbing ${
+                  className={`w-full flex items-center gap-2 px-2 py-1.5 text-left transition-all cursor-grab active:cursor-grabbing border-2 border-[var(--brutal-black)] font-semibold ${
                     isSelected
-                      ? 'bg-cyan-600/30 text-cyan-300 border border-cyan-500/50'
-                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                      ? 'bg-[var(--brutal-black)] text-[var(--brutal-yellow)] shadow-[3px_3px_0_var(--brutal-black)]'
+                      : 'bg-[var(--brutal-white)] text-[var(--brutal-black)] shadow-[2px_2px_0_var(--brutal-black)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_var(--brutal-black)]'
                   } ${isDragging ? 'opacity-50' : ''} ${
-                    isDragOver ? 'ring-2 ring-cyan-400 ring-inset' : ''
+                    isDragOver
+                      ? 'ring-2 ring-[var(--brutal-black)] ring-offset-2 ring-offset-[var(--brutal-pink)]'
+                      : ''
                   }`}
                 >
                   <GripVertical
                     size={14}
-                    className="flex-shrink-0 text-slate-500 drag-handle"
+                    className="flex-shrink-0 opacity-70"
                   />
-                  <Icon size={16} className="flex-shrink-0" />
+                  <Icon size={16} className="flex-shrink-0" strokeWidth={2.5} />
                   <span className="truncate text-sm flex-1">{getLabel(obj)}</span>
                 </div>
               )

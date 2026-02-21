@@ -131,9 +131,7 @@ function drawSelectionHandles(
   obj: CanvasObject
 ): void {
   const padding = 4
-  const handleSize = 8
-  const x = obj.x - padding
-  const y = obj.y - padding
+  const handleSize = 6
   const w = obj.width + padding * 2
   const h = obj.height + padding * 2
 
@@ -142,13 +140,16 @@ function drawSelectionHandles(
   ctx.rotate((obj.rotation * Math.PI) / 180)
   ctx.translate(-obj.width / 2 - padding, -obj.height / 2 - padding)
 
-  ctx.strokeStyle = '#3b82f6'
-  ctx.lineWidth = 2
-  ctx.setLineDash([])
+  const handleColor = '#2a2a2a'
+  ctx.strokeStyle = handleColor
+  ctx.lineWidth = 1
+  ctx.setLineDash([3, 2])
   ctx.strokeRect(0, 0, w, h)
 
+  ctx.setLineDash([])
   ctx.fillStyle = '#ffffff'
-  ctx.strokeStyle = '#3b82f6'
+  ctx.strokeStyle = handleColor
+  ctx.lineWidth = 1
   const handles = [
     [0, 0],
     [w / 2 - handleSize / 2, 0],
@@ -167,18 +168,43 @@ function drawSelectionHandles(
 
   const rotateHandleY = -20
   const rotateHandleX = w / 2
+  const rotateRadius = 6
+  ctx.setLineDash([3, 2])
   ctx.beginPath()
   ctx.moveTo(rotateHandleX, 0)
-  ctx.lineTo(rotateHandleX, rotateHandleY + 6)
+  ctx.lineTo(rotateHandleX, rotateHandleY + rotateRadius)
   ctx.stroke()
+  ctx.setLineDash([])
+
+  // Draw rotation icon (circular arrow)
+  ctx.lineWidth = 1
+  ctx.strokeStyle = handleColor
+  ctx.fillStyle = '#ffffff'
+  const arcStart = Math.PI * 0.35
+  const arcEnd = Math.PI * 1.8
   ctx.beginPath()
-  ctx.arc(rotateHandleX, rotateHandleY, 6, 0, Math.PI * 2)
-  ctx.fill()
+  ctx.arc(rotateHandleX, rotateHandleY, rotateRadius, arcStart, arcEnd)
   ctx.stroke()
+  // Arrowhead at end of arc - tip points in curve direction (tangent)
+  const ax = rotateHandleX + rotateRadius * Math.cos(arcEnd)
+  const ay = rotateHandleY + rotateRadius * Math.sin(arcEnd)
+  const tangentX = -Math.sin(arcEnd)
+  const tangentY = Math.cos(arcEnd)
+  const tipLen = 3
+  const tipX = ax + tipLen * tangentX
+  const tipY = ay + tipLen * tangentY
+  const backLen = 2.5
+  const arrowWidth = 1.4
   ctx.beginPath()
-  ctx.moveTo(rotateHandleX - 4, rotateHandleY - 4)
-  ctx.lineTo(rotateHandleX + 4, rotateHandleY - 4)
-  ctx.lineTo(rotateHandleX, rotateHandleY - 10)
+  ctx.moveTo(tipX, tipY)
+  ctx.lineTo(
+    ax - backLen * tangentX + backLen * arrowWidth * Math.cos(arcEnd),
+    ay - backLen * tangentY + backLen * arrowWidth * Math.sin(arcEnd)
+  )
+  ctx.lineTo(
+    ax - backLen * tangentX - backLen * arrowWidth * Math.cos(arcEnd),
+    ay - backLen * tangentY - backLen * arrowWidth * Math.sin(arcEnd)
+  )
   ctx.closePath()
   ctx.fill()
   ctx.stroke()

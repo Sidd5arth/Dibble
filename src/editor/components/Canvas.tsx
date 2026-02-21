@@ -50,8 +50,9 @@ export const Canvas = observer(function Canvas() {
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
     const gridSize = 20
-    ctx.strokeStyle = '#e5e7eb'
+    ctx.strokeStyle = '#0f0f0f'
     ctx.lineWidth = 0.5
+    ctx.globalAlpha = 0.15
     for (let x = 0; x <= CANVAS_WIDTH; x += gridSize) {
       ctx.beginPath()
       ctx.moveTo(x, 0)
@@ -64,6 +65,7 @@ export const Canvas = observer(function Canvas() {
       ctx.lineTo(CANVAS_WIDTH, y)
       ctx.stroke()
     }
+    ctx.globalAlpha = 1
 
     const selectedSet = new Set(store.selectedIds)
     store.objects.forEach((obj) => {
@@ -132,12 +134,12 @@ export const Canvas = observer(function Canvas() {
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-auto bg-slate-200 flex items-center justify-center p-4 min-h-0 outline-none"
+      className="flex-1 min-h-0 overflow-auto bg-[var(--brutal-yellow)] flex items-center justify-center p-4 outline-none"
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
       <div
-        className="shrink-0 bg-white shadow-2xl"
+        className="shrink-0 bg-[var(--brutal-white)] border-[3px] border-[var(--brutal-black)] shadow-[8px_8px_0_var(--brutal-black)]"
         style={{
           width: fit.width,
           height: fit.height,
