@@ -135,6 +135,7 @@ export const Canvas = observer(function Canvas() {
     <div
       ref={containerRef}
       className="flex-1 min-h-0 overflow-auto bg-[var(--brutal-yellow)] flex items-center justify-center p-4 outline-none"
+      style={{ height: '100%', minHeight: '100%' }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Canvas, LayersPanel, PropertiesPanel, EditorProvider, useEditorStore, useHistory } from '../editor'
 import EditorHeader from '../components/EditorHeader'
@@ -37,6 +37,8 @@ function HistoryManager() {
 }
 
 function EditorPage() {
+  const [isMobile, setIsMobile] = useState(false)
+
   useEffect(() => {
     document.documentElement.style.overflow = 'hidden'
     document.body.style.overflow = 'hidden'
@@ -45,6 +47,35 @@ function EditorPage() {
       document.body.style.overflow = ''
     }
   }, [])
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-[var(--brutal-white)] z-50">
+        <div className="text-center p-8 max-w-md">
+          <h1 className="text-3xl font-bold text-[var(--brutal-black)] mb-4">
+            Not Available on Mobile
+          </h1>
+          <p className="text-lg text-[var(--brutal-black)]/80 mb-6">
+            This editor is designed for desktop and tablet devices. Please use a larger screen to access the editor.
+          </p>
+          <div className="bg-[var(--brutal-yellow)] border-2 border-[var(--brutal-black)] shadow-[4px_4px_0_var(--brutal-black)] p-4">
+            <p className="text-sm font-semibold text-[var(--brutal-black)]">
+              Minimum screen width: 768px
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <EditorProvider>
