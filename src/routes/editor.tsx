@@ -14,12 +14,13 @@ function ZoomShortcuts() {
       if (!(e.ctrlKey || e.metaKey)) return
       const target = e.target as HTMLElement
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+      const canvasRect = document.querySelector('[data-editor-canvas]')?.getBoundingClientRect()
       if (e.key === '+' || e.key === '=') {
         e.preventDefault()
-        store.zoomBy(0.2)
+        store.zoomBy(0.2, 1, 4, canvasRect ?? undefined)
       } else if (e.key === '-') {
         e.preventDefault()
-        store.zoomBy(-0.2)
+        store.zoomBy(-0.2, 1, 4, canvasRect ?? undefined)
       } else if (e.key === '0') {
         e.preventDefault()
         store.zoomReset()

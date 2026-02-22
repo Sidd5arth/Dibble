@@ -49,9 +49,9 @@ export const Canvas = observer(function Canvas() {
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
-    const gridSize = 20
+    const gridSize = 40
     ctx.strokeStyle = '#0f0f0f'
-    ctx.lineWidth = 0.5
+    ctx.lineWidth = 1.5
     ctx.globalAlpha = 0.15
     for (let x = 0; x <= CANVAS_WIDTH; x += gridSize) {
       ctx.beginPath()
@@ -134,7 +134,7 @@ export const Canvas = observer(function Canvas() {
   return (
     <div
       ref={containerRef}
-      className="flex-1 min-h-0 overflow-auto bg-[var(--brutal-yellow)] flex items-center justify-center p-4 outline-none"
+      className="flex-1 min-h-0 overflow-hidden bg-[var(--brutal-yellow)] flex items-center justify-center p-4 outline-none"
       style={{ height: '100%', minHeight: '100%' }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -148,6 +148,7 @@ export const Canvas = observer(function Canvas() {
       >
         <canvas
           ref={canvasRef}
+          data-editor-canvas
           className="block w-full h-full cursor-crosshair"
           style={{ touchAction: 'none' }}
           onPointerDown={handlePointerDown}

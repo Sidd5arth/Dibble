@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react'
-import { screenToCanvas } from '../utils/coords'
+import { screenToCanvas, CANVAS_WIDTH, CANVAS_HEIGHT } from '../utils/coords'
 import { hitTest } from '../utils/hitTest'
 import { useEditorStore } from '../context/EditorContext'
 import type { CanvasObject } from '../types'
@@ -88,12 +88,16 @@ export function useCanvasInteraction(
 ) {
   const store = useEditorStore()
   const dragRef = useRef<{
-    type: 'move' | 'resize' | 'rotate' | 'pen-drag'
+    type: 'move' | 'resize' | 'rotate' | 'pen-drag' | 'pan'
     obj: CanvasObject
     handle: Handle
     startX: number
     startY: number
     startObj: { x: number; y: number; width: number; height: number; rotation: number }
+    startViewportX?: number
+    startViewportY?: number
+    startScreenX?: number
+    startScreenY?: number
   } | null>(null)
 
   const getCanvasRect = useCallback(
@@ -117,6 +121,23 @@ export function useCanvasInteraction(
       e.preventDefault()
       e.stopPropagation()
       e.currentTarget.setPointerCapture(e.pointerId)
+
+      // Check for shift+click or middle mouse to pan
+      if (e.shiftKey || e.button === 1) {
+        dragRef.current = {
+          type: 'pan',
+          obj: store.objects[0], // dummy
+          handle: null,
+          startX: 0,
+          startY: 0,
+          startObj: { x: 0, y: 0, width: 0, height: 0, rotation: 0 },
+          startViewportX: store.viewport.x,
+          startViewportY: store.viewport.y,
+          startScreenX: e.clientX,
+          startScreenY: e.clientY,
+        }
+        return
+      }
 
       const { objects, selectedIds, tool } = store
       const { x, y } = toCanvas(e.clientX, e.clientY)
@@ -353,9 +374,26 @@ export function useCanvasInteraction(
           handleOut: { x: dx, y: dy },
           handleIn: { x: -dx, y: -dy },
         })
+      } else if (drag.type === 'pan') {
+        // Pan the canvas viewport
+        if (drag.startViewportX !== undefined && drag.startViewportY !== undefined &&
+            drag.startScreenX !== undefined && drag.startScreenY !== undefined) {
+          const canvasRect = getCanvasRect()
+          const screenDx = e.clientX - drag.startScreenX
+          const screenDy = e.clientY - drag.startScreenY
+
+          // Convert screen delta to viewport space (viewport is in buffer coords)
+          const vpDx = (screenDx * CANVAS_WIDTH) / (canvasRect.width || 1)
+          const vpDy = (screenDy * CANVAS_HEIGHT) / (canvasRect.height || 1)
+
+          store.setViewport({
+            x: drag.startViewportX + vpDx,
+            y: drag.startViewportY + vpDy,
+          }, canvasRect)
+        }
       }
     },
-    [store, canvasRef, toCanvas]
+    [store, canvasRef, toCanvas, getCanvasRect]
   )
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {

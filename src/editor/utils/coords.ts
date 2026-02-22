@@ -1,7 +1,7 @@
 import type { Viewport } from '../types'
 
-export const CANVAS_WIDTH = 800
-export const CANVAS_HEIGHT = 600
+export const CANVAS_WIDTH = 3200
+export const CANVAS_HEIGHT = 2400
 
 /**
  * Convert screen coordinates (mouse position) to canvas/design coordinates.
@@ -19,7 +19,11 @@ export function screenToCanvas(
   const bufferY = (displayY * CANVAS_HEIGHT) / (canvasRect.height || 1)
   const x = (bufferX - viewport.x) / viewport.zoom
   const y = (bufferY - viewport.y) / viewport.zoom
-  return { x, y }
+  // Round to 2 decimal places to prevent floating point drift accumulation
+  return { 
+    x: Math.round(x * 100) / 100, 
+    y: Math.round(y * 100) / 100 
+  }
 }
 
 /**

@@ -2,11 +2,13 @@ import { makeAutoObservable } from 'mobx'
 import type { CanvasObject, Tool, Viewport, PathPoint } from '../types'
 import { generateId } from '../utils/id'
 import { createHistoryStore } from './history'
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../utils/coords'
 
+// Center the canvas on initial render: viewport offset = center * (1 - zoom)
 const initialViewport: Viewport = {
-  x: 0,
-  y: 0,
-  zoom: 1,
+  x: (CANVAS_WIDTH / 2) * (1 - 4),
+  y: (CANVAS_HEIGHT / 2) * (1 - 4),
+  zoom: 4,
 }
 
 export class EditorStore {
@@ -116,13 +118,80 @@ export class EditorStore {
     this.historyFutureLength = this.history.getFutureLength()
   }
 
-  setViewport(updates: Partial<Viewport>) {
-    this.viewport = { ...this.viewport, ...updates }
+  setViewport(updates: Partial<Viewport>, canvasRect?: DOMRect) {
+    // Round zoom and pan values to prevent floating point drift
+    const roundedUpdates: Partial<Viewport> = { ...updates }
+    let newZoom = updates.zoom !== undefined ? updates.zoom : this.viewport.zoom
+    if (updates.zoom !== undefined) {
+      newZoom = Math.round(updates.zoom * 1000000) / 1000000
+      roundedUpdates.zoom = newZoom
+    }
+    
+    // Calculate bounds for panning
+    let newX = updates.x !== undefined ? updates.x : this.viewport.x
+    let newY = updates.y !== undefined ? updates.y : this.viewport.y
+    
+    if (canvasRect && (updates.x !== undefined || updates.y !== undefined || updates.zoom !== undefined)) {
+      const displayWidth = canvasRect.width
+      const displayHeight = canvasRect.height
+      
+      // The coordinate system works like this:
+      // 1. Canvas (CANVAS_WIDTH x CANVAS_HEIGHT) is scaled to fit display (displayWidth x displayHeight)
+      // 2. We translate by (viewport.x, viewport.y) in buffer space
+      // 3. We scale by zoom
+      // 
+      // In buffer space, viewport coordinates map to canvas coordinates:
+      // bufferX = (displayX * CANVAS_WIDTH) / displayWidth
+      // So the canvas spans from 0 to CANVAS_WIDTH in buffer space
+      // After zoom, the visible area in buffer space = (display size * CANVAS_WIDTH / displayWidth) / zoom
+      const scaleX = CANVAS_WIDTH / displayWidth
+      const scaleY = CANVAS_HEIGHT / displayHeight
+      const visibleWidth = (displayWidth * scaleX) / newZoom
+      const visibleHeight = (displayHeight * scaleY) / newZoom
+      
+      // Canvas bounds in buffer space (actual canvas dimensions)
+      const canvasMaxX = CANVAS_WIDTH
+      const canvasMaxY = CANVAS_HEIGHT
+      
+      // Only clamp viewport position if visible area is smaller than canvas (zoomed in)
+      // If visible area is larger than canvas (zoomed out), allow free panning
+      if (visibleWidth <= canvasMaxX && visibleHeight <= canvasMaxY) {
+        // Zoomed in: clamp to prevent showing empty space beyond canvas boundaries
+        // viewport.x in [canvasMaxX*(1-zoom), 0] keeps design 0..CANVAS_WIDTH in view
+        const minX = canvasMaxX * (1 - newZoom)
+        const minY = canvasMaxY * (1 - newZoom)
+        const maxX = 0
+        const maxY = 0
+        
+        newX = Math.max(minX, Math.min(maxX, newX))
+        newY = Math.max(minY, Math.min(maxY, newY))
+      }
+      // If zoomed out (visibleWidth > canvasMaxX or visibleHeight > canvasMaxY), allow panning without bounds
+    }
+    
+    if (updates.x !== undefined) {
+      roundedUpdates.x = Math.round(newX * 100) / 100
+    }
+    if (updates.y !== undefined) {
+      roundedUpdates.y = Math.round(newY * 100) / 100
+    }
+    
+    this.viewport = { ...this.viewport, ...roundedUpdates }
   }
 
-  zoomBy(delta: number, min = 0.25, max = 4) {
-    const next = Math.max(min, Math.min(max, this.viewport.zoom * (1 + delta)))
-    this.setViewport({ zoom: next })
+  zoomBy(delta: number, min = 1, max = 4, canvasRect?: DOMRect) {
+    const z1 = this.viewport.zoom
+    const next = Math.max(min, Math.min(max, z1 * (1 + delta)))
+    const z2 = Math.round(next * 1000000) / 1000000
+    if (z2 === z1) return
+
+    // Zoom from center: keep the design point at screen center fixed
+    const centerX = CANVAS_WIDTH / 2
+    const centerY = CANVAS_HEIGHT / 2
+    const ratio = z2 / z1
+    const newX = centerX * (1 - ratio) + this.viewport.x * ratio
+    const newY = centerY * (1 - ratio) + this.viewport.y * ratio
+    this.setViewport({ zoom: z2, x: newX, y: newY }, canvasRect)
   }
 
   zoomReset() {
