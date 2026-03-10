@@ -155,6 +155,81 @@ function distToSegmentSimple(
 }
 
 /**
+ * Get axis-aligned bounding box of an object (accounts for rotation)
+ */
+function getObjectAABB(obj: {
+  x: number
+  y: number
+  width: number
+  height: number
+  rotation: number
+}): { minX: number; minY: number; maxX: number; maxY: number } {
+  if (obj.rotation === 0) {
+    return {
+      minX: obj.x,
+      minY: obj.y,
+      maxX: obj.x + obj.width,
+      maxY: obj.y + obj.height,
+    }
+  }
+  const rad = (obj.rotation * Math.PI) / 180
+  const cos = Math.cos(rad)
+  const sin = Math.sin(rad)
+  const cx = obj.x + obj.width / 2
+  const cy = obj.y + obj.height / 2
+  const corners = [
+    [obj.x, obj.y],
+    [obj.x + obj.width, obj.y],
+    [obj.x + obj.width, obj.y + obj.height],
+    [obj.x, obj.y + obj.height],
+  ]
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const [lx, ly] of corners) {
+    const dx = lx - obj.width / 2
+    const dy = ly - obj.height / 2
+    const rx = cx + dx * cos - dy * sin
+    const ry = cy + dx * sin + dy * cos
+    minX = Math.min(minX, rx)
+    minY = Math.min(minY, ry)
+    maxX = Math.max(maxX, rx)
+    maxY = Math.max(maxY, ry)
+  }
+  return { minX, minY, maxX, maxY }
+}
+
+function rectsIntersect(
+  r1: { minX: number; minY: number; maxX: number; maxY: number },
+  r2: { minX: number; minY: number; maxX: number; maxY: number }
+): boolean {
+  return r1.minX <= r2.maxX && r1.maxX >= r2.minX && r1.minY <= r2.maxY && r1.maxY >= r2.minY
+}
+
+/**
+ * Find all objects that intersect the given selection rectangle
+ */
+export function objectsInRect(
+  objects: CanvasObject[],
+  selMinX: number,
+  selMinY: number,
+  selMaxX: number,
+  selMaxY: number
+): CanvasObject[] {
+  const sel = {
+    minX: Math.min(selMinX, selMaxX),
+    minY: Math.min(selMinY, selMaxY),
+    maxX: Math.max(selMinX, selMaxX),
+    maxY: Math.max(selMinY, selMaxY),
+  }
+  return objects.filter((obj) => {
+    const aabb = getObjectAABB(obj)
+    return rectsIntersect(sel, aabb)
+  })
+}
+
+/**
  * Find the topmost object at the given canvas coordinates
  */
 export function hitTest(

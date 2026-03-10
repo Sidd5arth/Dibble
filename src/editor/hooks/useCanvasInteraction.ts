@@ -1,8 +1,15 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useState } from 'react'
 import { screenToCanvas, CANVAS_WIDTH, CANVAS_HEIGHT } from '../utils/coords'
-import { hitTest } from '../utils/hitTest'
+import { hitTest, objectsInRect } from '../utils/hitTest'
 import { useEditorStore } from '../context/EditorContext'
 import type { CanvasObject } from '../types'
+
+export interface MarqueeRect {
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+}
 
 export interface ViewportApi {
   getCanvasRect: () => DOMRect
@@ -87,8 +94,10 @@ export function useCanvasInteraction(
   viewport?: ViewportApi
 ) {
   const store = useEditorStore()
+  const [marqueeRect, setMarqueeRect] = useState<MarqueeRect | null>(null)
+
   const dragRef = useRef<{
-    type: 'move' | 'resize' | 'rotate' | 'pen-drag' | 'pan'
+    type: 'move' | 'resize' | 'rotate' | 'pen-drag' | 'pan' | 'marquee'
     obj: CanvasObject
     handle: Handle
     startX: number
@@ -98,6 +107,8 @@ export function useCanvasInteraction(
     startViewportY?: number
     startScreenX?: number
     startScreenY?: number
+    marqueeStartX?: number
+    marqueeStartY?: number
   } | null>(null)
 
   const getCanvasRect = useCallback(
@@ -204,7 +215,19 @@ export function useCanvasInteraction(
             },
           }
         } else {
+          // Start marquee selection
           store.clearSelection()
+          setMarqueeRect({ x1: x, y1: y, x2: x, y2: y })
+          dragRef.current = {
+            type: 'marquee',
+            obj: store.objects[0] ?? ({} as CanvasObject),
+            handle: null,
+            startX: x,
+            startY: y,
+            startObj: { x: 0, y: 0, width: 0, height: 0, rotation: 0 },
+            marqueeStartX: x,
+            marqueeStartY: y,
+          }
         }
       } else if (tool === 'rect') {
         store.addObject({
@@ -366,6 +389,23 @@ export function useCanvasInteraction(
         } else {
           store.updateObject(drag.obj.id, { x: ox, y: oy, width: w, height: h })
         }
+      } else if (drag.type === 'marquee') {
+        setMarqueeRect({
+          x1: drag.marqueeStartX ?? drag.startX,
+          y1: drag.marqueeStartY ?? drag.startY,
+          x2: x,
+          y2: y,
+        })
+        const x1 = drag.marqueeStartX ?? drag.startX
+        const y1 = drag.marqueeStartY ?? drag.startY
+        const x2 = x
+        const y2 = y
+        const minX = Math.min(x1, x2)
+        const maxX = Math.max(x1, x2)
+        const minY = Math.min(y1, y2)
+        const maxY = Math.max(y1, y2)
+        const intersected = objectsInRect(store.objects, minX, minY, maxX, maxY)
+        store.setSelectedIds(intersected.map((o) => o.id))
       } else if (drag.type === 'pen-drag') {
         // Update the handles of the last point
         const dx = x - drag.startX
@@ -402,6 +442,9 @@ export function useCanvasInteraction(
     } catch {
       // Ignore if pointer already released
     }
+    if (dragRef.current?.type === 'marquee') {
+      setMarqueeRect(null)
+    }
     dragRef.current = null
   }, [])
 
@@ -432,5 +475,6 @@ export function useCanvasInteraction(
     handlePointerMove,
     handlePointerUp,
     handleKeyDown,
+    marqueeRect,
   }
 }

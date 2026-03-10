@@ -82,8 +82,7 @@ function EditorPage() {
     <EditorProvider>
       <ZoomShortcuts />
       <HistoryManager />
-      <EditorHeader />
-      <div className="fixed top-16 left-0 right-0 bottom-0 flex flex-col overflow-hidden bg-[var(--brutal-white)]">
+      <div className="fixed top-16 left-0 right-0 bottom-0 z-0 flex flex-col overflow-hidden bg-[var(--brutal-white)]">
         <div className="flex flex-1 min-h-0 overflow-hidden">
           <LayersPanel />
           <div className="flex-1 min-w-0 min-h-0 overflow-hidden">
@@ -92,6 +91,7 @@ function EditorPage() {
           <PropertiesPanel />
         </div>
       </div>
+      <EditorHeader />
     </EditorProvider>
   )
 }

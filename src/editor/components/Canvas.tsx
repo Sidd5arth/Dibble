@@ -13,7 +13,7 @@ export const Canvas = observer(function Canvas() {
   const { fit, getCanvasRect, screenToCanvas, CANVAS_WIDTH, CANVAS_HEIGHT } =
     useViewport(containerRef, canvasRef)
 
-  const { handlePointerDown, handlePointerMove, handlePointerUp, handleKeyDown } =
+  const { handlePointerDown, handlePointerMove, handlePointerUp, handleKeyDown, marqueeRect } =
     useCanvasInteraction(canvasRef, {
       getCanvasRect,
       screenToCanvas,
@@ -72,6 +72,21 @@ export const Canvas = observer(function Canvas() {
       drawObject(ctx, obj, selectedSet.has(obj.id))
     })
 
+    // Draw marquee selection box
+    if (marqueeRect) {
+      const x = Math.min(marqueeRect.x1, marqueeRect.x2)
+      const y = Math.min(marqueeRect.y1, marqueeRect.y2)
+      const w = Math.abs(marqueeRect.x2 - marqueeRect.x1)
+      const h = Math.abs(marqueeRect.y2 - marqueeRect.y1)
+      ctx.strokeStyle = '#3b82f6'
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.15)'
+      ctx.lineWidth = 2
+      ctx.setLineDash([4, 4])
+      ctx.fillRect(x, y, w, h)
+      ctx.strokeRect(x, y, w, h)
+      ctx.setLineDash([])
+    }
+
     // Draw in-progress pen path
     if (store.isPenDrawing && store.penPoints.length > 0) {
       ctx.strokeStyle = '#3b82f6'
@@ -129,7 +144,7 @@ export const Canvas = observer(function Canvas() {
     }
 
     ctx.restore()
-  }, [store.objects, store.selectedIds, store.viewport, store.isPenDrawing, store.penPoints])
+  }, [store.objects, store.selectedIds, store.viewport, store.isPenDrawing, store.penPoints, marqueeRect])
 
   return (
     <div

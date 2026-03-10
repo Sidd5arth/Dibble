@@ -12,9 +12,11 @@ import {
   Redo2,
   Trash2,
   Pen,
+  Download,
 } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useEditorStore } from '../editor/context/EditorContext'
+import { exportCanvasAsImage } from '../editor/utils/exportCanvas'
 import type { Tool } from '../editor/types'
 
 const tools: { id: Tool; icon: typeof MousePointer2; label: string }[] = [
@@ -27,6 +29,7 @@ const tools: { id: Tool; icon: typeof MousePointer2; label: string }[] = [
 
 const EditorHeader = observer(function EditorHeader() {
   const [isOpen, setIsOpen] = useState(false)
+  const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const store = useEditorStore()
 
   const btnBase =
@@ -36,7 +39,7 @@ const EditorHeader = observer(function EditorHeader() {
 
   return (
     <>
-      <header className="flex-shrink-0 h-16 px-4 flex items-center gap-4 bg-[var(--brutal-yellow)] border-b-[3px] border-[var(--brutal-black)]">
+      <header className="fixed top-0 left-0 right-0 z-50 flex-shrink-0 h-16 px-4 flex items-center gap-4 bg-[var(--brutal-yellow)] border-b-[3px] border-[var(--brutal-black)]">
         <button
           onClick={() => setIsOpen(true)}
           className="p-2 bg-white border-2 border-[var(--brutal-black)] shadow-[3px_3px_0_var(--brutal-black)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_var(--brutal-black)] transition-all shrink-0"
@@ -90,6 +93,60 @@ const EditorHeader = observer(function EditorHeader() {
           >
             <Trash2 size={18} strokeWidth={2.5} />
           </button>
+          <div className="relative shrink-0">
+            <button
+              onClick={() => setExportMenuOpen((v) => !v)}
+              title="Export"
+              className={`${btnBase} ${btnInactive}`}
+            >
+              <Download size={18} strokeWidth={2.5} />
+            </button>
+            {exportMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setExportMenuOpen(false)}
+                  aria-hidden
+                />
+                <div
+                  className="absolute right-0 top-full mt-1 z-50 flex flex-col bg-[var(--brutal-white)] border-2 border-[var(--brutal-black)] shadow-[3px_3px_0_var(--brutal-black)] min-w-32"
+                  role="menu"
+                  style={{zIndex: "100000"}}
+                >
+                  <button
+                    onClick={() => {
+                      exportCanvasAsImage(
+                        [...store.objects],
+                        'png',
+                        undefined,
+                        store.selectedIds.length > 0 ? [...store.selectedIds] : undefined
+                      )
+                      setExportMenuOpen(false)
+                    }}
+                    className="px-4 py-2 text-left hover:bg-[var(--brutal-yellow)] font-medium border-b-2 border-[var(--brutal-black)]"
+                    role="menuitem"
+                  >
+                    {store.selectedIds.length > 0 ? 'Export selected as PNG' : 'Export as PNG'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      exportCanvasAsImage(
+                        [...store.objects],
+                        'jpeg',
+                        undefined,
+                        store.selectedIds.length > 0 ? [...store.selectedIds] : undefined
+                      )
+                      setExportMenuOpen(false)
+                    }}
+                    className="px-4 py-2 text-left hover:bg-[var(--brutal-yellow)] font-medium"
+                    role="menuitem"
+                  >
+                    {store.selectedIds.length > 0 ? 'Export selected as JPEG' : 'Export as JPEG'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
