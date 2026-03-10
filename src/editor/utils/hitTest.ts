@@ -177,21 +177,21 @@ function getObjectAABB(obj: {
   const sin = Math.sin(rad)
   const cx = obj.x + obj.width / 2
   const cy = obj.y + obj.height / 2
-  const corners = [
-    [obj.x, obj.y],
-    [obj.x + obj.width, obj.y],
-    [obj.x + obj.width, obj.y + obj.height],
-    [obj.x, obj.y + obj.height],
+  const w2 = obj.width / 2
+  const h2 = obj.height / 2
+  const corners: [number, number][] = [
+    [-w2, -h2],
+    [w2, -h2],
+    [w2, h2],
+    [-w2, h2],
   ]
   let minX = Infinity
   let minY = Infinity
   let maxX = -Infinity
   let maxY = -Infinity
   for (const [lx, ly] of corners) {
-    const dx = lx - obj.width / 2
-    const dy = ly - obj.height / 2
-    const rx = cx + dx * cos - dy * sin
-    const ry = cy + dx * sin + dy * cos
+    const rx = cx + lx * cos - ly * sin
+    const ry = cy + lx * sin + ly * cos
     minX = Math.min(minX, rx)
     minY = Math.min(minY, ry)
     maxX = Math.max(maxX, rx)
