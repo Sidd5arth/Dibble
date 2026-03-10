@@ -86,7 +86,7 @@ function HomePage() {
             </h1>
           </div>
           <p className="text-lg md:text-xl text-[var(--brutal-black)] mb-2 font-bold">
-            Canva-style design editor
+            A design tool
           </p>
           <p className="text-base text-[var(--brutal-black)]/80 max-w-2xl mx-auto mb-8 font-medium">
             Create designs with shapes, text, and freehand drawing. Pan and zoom
